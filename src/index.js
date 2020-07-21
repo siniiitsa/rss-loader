@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import onChange from 'on-change';
-import axios from 'axios';
 import { renderForm, renderFeedback } from './view.js';
 
 const validateRssLink = (watchedState) => {
@@ -48,7 +47,7 @@ const app = () => {
     feedbackContainer: document.querySelector('.feedback'),
   };
 
-  const watchedState = onChange(state, (path, newValue, oldValue) => {
+  const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'form.isValid':
         renderForm(watchedState, elements);
