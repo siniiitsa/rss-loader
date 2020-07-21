@@ -5,26 +5,34 @@
   </head>
   <body>
     <main>
-      <div class="container mt-5">
-        <div class="jumbotron">
-          <h1>RSS Aggregator</h1>
-          <p class="lead">Start reading RSS today! It is easy, it is nicely.</p>
-          <hr class="my-4" />
-          <p class="text-muted">https://ru.hexlet.io/lessons.rss</p>
-          <form action="" class="from-inline">
-            <div class="form-group">
-              <input
-                type="text"
-                name="url"
-                class="form-control"
-                required
-                placeholder="rss link"
-              />
+      <section class="jumbotron jumbotron-fluid bg-dark">
+        <div class="container-xl text-white">
+          <h1 class="display-3">RSS Reader</h1>
+          <p class="lead">Start reading RSS today!</p>
+          <p class="text-muted my-1">
+            Example: https://ru.hexlet.io/lessons.rss
+          </p>
+          <form action="" data-form="load-rss-form">
+            <div class="form-row">
+              <div class="col">
+                <input
+                  required
+                  type="text"
+                  name="rss-link"
+                  class="form-control"
+                  placeholder="rss link"
+                />
+              </div>
+              <div class="col-auto">
+                <input type="submit" class="btn btn-primary" />
+              </div>
             </div>
-            <input type="submit" class="btn btn-primary" />
           </form>
+          <p class="feedback my-1"></p>
         </div>
-      </div>
+      </section>
+
+      <section></section>
     </main>
   </body>
 </html>
