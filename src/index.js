@@ -31,6 +31,12 @@ const updateValidationState = (watchedState) => {
   };
 };
 
+const parseFeed = (data) => {
+  const domparser = new DOMParser();
+  const res = domparser.parseFromString(data, 'text/xml');
+  return res;
+};
+
 const app = () => {
   const state = {
     form: {
@@ -81,7 +87,8 @@ const app = () => {
     axios.get(state.form.rssLink)
       .then((res) => {
         watchedState.processStatus = 'filling';
-        console.log(res.data);
+        const parsed = parseFeed(res.data);
+        console.log(parsed);
       })
       .catch((err) => {
         watchedState.processStatus = 'failed';
@@ -89,7 +96,7 @@ const app = () => {
           message: err.message,
           type: 'error',
         };
-        // TODO finish error handling with status code message
+        console.dir(err);
       });
   });
 };
