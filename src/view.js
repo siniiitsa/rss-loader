@@ -9,10 +9,16 @@ export const renderForm = (watchedState, elements) => {
 
 export const renderFeedback = (watchedState, elements) => {
   const { feedbackContainer } = elements;
-  feedbackContainer.innerHTML = watchedState.feedback;
-  if (watchedState.form.isValid) {
-    feedbackContainer.classList.remove('text-danger');
-  } else {
-    feedbackContainer.classList.add('text-danger');
+  const { message, type } = watchedState.feedback;
+  switch (type) {
+    case 'success':
+      feedbackContainer.classList.remove('text-danger');
+      break;
+    case 'error':
+      feedbackContainer.classList.add('text-danger');
+      break;
+    default:
+      throw new Error(`Unknown feedback type: ${type}`);
   }
+  feedbackContainer.innerHTML = message;
 };
