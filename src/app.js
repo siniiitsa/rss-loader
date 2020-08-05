@@ -9,12 +9,12 @@ import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { parseRssToFeed } from './parser';
 
-const schema = yup // good
+const schema = yup
   .string()
   .url(i18next.t('errorMessages.invalidUrl'))
   .required(i18next.t('errorMessages.rssRequired'));
 
-const validateRssLink = (watchedState) => { // good
+const validateRssLink = (watchedState) => {
   try {
     schema.test(
       'check if already loaded',
@@ -27,7 +27,7 @@ const validateRssLink = (watchedState) => { // good
   }
 };
 
-const updateValidationState = (watchedState) => { // good
+const updateValidationState = (watchedState) => {
   const errors = validateRssLink(watchedState);
   watchedState.form.validationErrors = errors;
   return errors.length === 0;
@@ -66,14 +66,14 @@ const runApp = () => {
         rssLink: '',
       },
     },
-    processStatus: 'filling', // filling, loading, loaded, failed
+    processStatus: 'filling',
     processErrors: [],
     loadedLinks: [],
     loadedFeeds: [],
     loadedArticles: [],
   };
 
-  const elements = { // good
+  const elements = {
     form: document.querySelector('form[data-form="load-rss-form"]'),
     rssLinkField: document.querySelector('input[name="rss-link"]'),
     feedbackContainer: document.querySelector('.feedback'),
