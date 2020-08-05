@@ -4,20 +4,21 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
 import i18next from 'i18next';
+import { isEqual, noop } from 'lodash';
 import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { parseRssToFeed } from './parser';
 
-const schema = yup
+const schema = yup // good
   .string()
-  .url(i18next.t('feedback.invalidUrl'))
-  .required(i18next.t('feedback.rssRequired'));
+  .url(i18next.t('errorMessages.invalidUrl'))
+  .required(i18next.t('errorMessages.rssRequired'));
 
-const validateRssLink = (watchedState) => {
+const validateRssLink = (watchedState) => { // good
   try {
     schema.test(
-      'check if already added',
-      i18next.t('feedback.alreadyLoaded'),
+      'check if already loaded',
+      i18next.t('errorMessages.alreadyLoaded'),
       (link) => !watchedState.loadedLinks.includes(link),
     ).validateSync(watchedState.form.fields.rssLink);
     return [];
@@ -26,34 +27,91 @@ const validateRssLink = (watchedState) => {
   }
 };
 
-const updateValidationState = (watchedState) => {
-  const [error] = validateRssLink(watchedState);
-  watchedState.form.isValid = !error;
-  watchedState.feedback = {
-    message: error || '',
-    type: error ? 'error' : 'success',
-  };
+const updateValidationState = (watchedState) => { // good
+  const errors = validateRssLink(watchedState);
+  watchedState.form.validationErrors = errors;
+  return errors.length === 0;
 };
 
 const updateLoadedFeedsState = (watchedState, rssData) => {
   const { feed, articles } = parseRssToFeed(rssData);
+  watchedState.processErrors = [];
   watchedState.loadedArticles = [...watchedState.loadedArticles, ...articles];
   watchedState.loadedFeeds = [...watchedState.loadedFeeds, feed];
   watchedState.loadedLinks = [...watchedState.loadedLinks, watchedState.form.fields.rssLink];
-  watchedState.processStatus = 'filling';
   watchedState.form.fields.rssLink = '';
-  watchedState.feedback = {
-    message: i18next.t('feedback.feedLoaded'),
-    type: 'success',
-  };
+  watchedState.processStatus = 'loaded';
 };
 
 const handleLoadingError = (watchedState, error) => {
+  watchedState.processErrors = [error.message];
   watchedState.processStatus = 'failed';
-  watchedState.feedback = {
-    message: error.message,
-    type: 'error',
+};
+
+const processStatusMapping = {
+  filling: noop,
+  loading: noop,
+  loaded: (watchedState, elements) => {
+    renderFeeds(watchedState, elements);
+    renderFeedback(watchedState, elements);
+  },
+  failed: renderFeedback,
+};
+
+const runApp = () => {
+  const state = {
+    form: {
+      validationErrors: [],
+      fields: {
+        rssLink: '',
+      },
+    },
+    processStatus: 'filling', // filling, loading, loaded, failed
+    processErrors: [],
+    loadedLinks: [],
+    loadedFeeds: [],
+    loadedArticles: [],
   };
+
+  const elements = { // good
+    form: document.querySelector('form[data-form="load-rss-form"]'),
+    rssLinkField: document.querySelector('input[name="rss-link"]'),
+    feedbackContainer: document.querySelector('.feedback'),
+    feedsContainer: document.querySelector('.feeds'),
+  };
+
+  const watchedState = onChange(state, (path, newValue, oldValue) => {
+    switch (path) {
+      case 'form.validationErrors':
+        if (isEqual(newValue, oldValue)) break;
+        renderForm(watchedState, elements);
+        renderFeedback(watchedState, elements);
+        break;
+      case 'processStatus':
+        console.log(`Process status changed from ${oldValue} to ${newValue}`);
+        if (newValue === 'filling') break;
+        processStatusMapping[newValue](watchedState, elements);
+        break;
+      default:
+        break;
+    }
+  });
+
+  elements.rssLinkField.addEventListener('input', (e) => {
+    watchedState.form.fields.rssLink = e.target.value.trim();
+    watchedState.processStatus = 'filling';
+  });
+
+  elements.form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isValid = updateValidationState(watchedState);
+    if (isValid) {
+      watchedState.processStatus = 'loading';
+      axios.get(state.form.fields.rssLink)
+        .then((response) => updateLoadedFeedsState(watchedState, response.data))
+        .catch((error) => handleLoadingError(watchedState, error));
+    }
+  });
 };
 
 const app = () => {
@@ -61,62 +119,7 @@ const app = () => {
     lng: 'en',
     debug: true,
     resources,
-  }).then(() => {
-    const state = {
-      form: {
-        isValid: true,
-        fields: {
-          rssLink: '',
-        },
-      },
-      processStatus: 'filling',
-      feedback: {
-        message: '',
-        type: 'success',
-      },
-      loadedLinks: [],
-      loadedFeeds: [],
-      loadedArticles: [],
-    };
-
-    const elements = {
-      form: document.querySelector('form[data-form="load-rss-form"]'),
-      rssLinkField: document.querySelector('input[name="rss-link"]'),
-      feedbackContainer: document.querySelector('.feedback'),
-      feedsContainer: document.querySelector('.feeds'),
-    };
-
-    const watchedState = onChange(state, (path) => {
-      switch (path) {
-        case 'form.isValid':
-          renderForm(watchedState, elements);
-          break;
-        case 'feedback':
-          renderFeedback(watchedState, elements);
-          break;
-        case 'loadedFeeds':
-          renderFeeds(watchedState, elements);
-          break;
-        default:
-          break;
-      }
-    });
-
-    elements.rssLinkField.addEventListener('input', (e) => {
-      watchedState.form.fields.rssLink = e.target.value.trim();
-    });
-
-    elements.form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      updateValidationState(watchedState);
-      if (state.form.isValid) {
-        watchedState.processStatus = 'requesting';
-        axios.get(state.form.fields.rssLink)
-          .then((response) => updateLoadedFeedsState(watchedState, response.data))
-          .catch((error) => handleLoadingError(watchedState, error));
-      }
-    });
-  });
+  }).then(runApp);
 };
 
 export default app;

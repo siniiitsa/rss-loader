@@ -1,28 +1,30 @@
-import { has } from 'lodash';
+import i18next from 'i18next';
 
 const renderForm = (watchedState, elements) => {
-  const { isValid } = watchedState.form;
+  const isValid = watchedState.form.validationErrors.length === 0;
   elements.rssLinkField.classList[isValid ? 'remove' : 'add']('is-invalid');
 };
 
-const feedbackTypeMapping = {
-  success: (elements) => {
-    elements.feedbackContainer.classList.remove('text-danger');
-    elements.feedbackContainer.classList.add('text-success');
-  },
-  error: (elements) => {
-    elements.feedbackContainer.classList.remove('text-success');
-    elements.feedbackContainer.classList.add('text-danger');
-  },
-};
-
 const renderFeedback = (watchedState, elements) => {
-  const { message, type } = watchedState.feedback;
-  if (!has(feedbackTypeMapping, type)) {
-    throw new Error(`Unknown feedback type: ${type}`);
+  const { feedbackContainer } = elements;
+  const { form } = watchedState;
+  const isValid = form.validationErrors.length === 0;
+  let message = '';
+  let styleType = 'success';
+  if (!isValid) {
+    // eslint-disable-next-line prefer-destructuring
+    message = form.validationErrors[0];
+    styleType = 'error';
+  } else if (watchedState.processStatus === 'loaded') {
+    message = i18next.t('successMessages.feedLoaded');
+  } else if (watchedState.processStatus === 'failed') {
+    // eslint-disable-next-line prefer-destructuring
+    message = watchedState.processErrors[0];
+    styleType = 'error';
   }
-  feedbackTypeMapping[type](elements);
-  elements.feedbackContainer.innerHTML = message;
+  feedbackContainer.innerHTML = message;
+  feedbackContainer.classList[styleType === 'success' ? 'add' : 'remove']('text-success');
+  feedbackContainer.classList[styleType === 'error' ? 'add' : 'remove']('text-danger');
 };
 
 const buildFeedsHTML = (watchedState) => {
