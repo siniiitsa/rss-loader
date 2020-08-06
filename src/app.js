@@ -91,10 +91,8 @@ const runApp = () => {
         renderFeedback(watchedState, elements);
         break;
       case 'processStatus':
-        console.log(`Process status changed from ${oldValue} to ${newValue}`);
         if (newValue === 'filling') break;
         processStatusMapping[newValue](watchedState, elements);
-        console.log(watchedState);
         break;
       default:
         break;
