@@ -12,13 +12,11 @@ const renderFeedback = (watchedState, elements) => {
   let message = '';
   let styleType = 'success';
   if (!isValid) {
-    // eslint-disable-next-line prefer-destructuring
     message = form.validationErrors[0];
     styleType = 'error';
   } else if (watchedState.processStatus === 'loaded') {
     message = i18next.t('successMessages.feedLoaded');
   } else if (watchedState.processStatus === 'failed') {
-    // eslint-disable-next-line prefer-destructuring
     message = watchedState.processErrors[0];
     styleType = 'error';
   }

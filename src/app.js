@@ -5,6 +5,7 @@ import onChange from 'on-change';
 import axios from 'axios';
 import i18next from 'i18next';
 import { isEqual, noop } from 'lodash';
+import { enableCorsAnywhere } from './cors-anywhere.js';
 import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { parseRssToFeed } from './parser';
@@ -59,6 +60,8 @@ const processStatusMapping = {
 };
 
 const runApp = () => {
+  enableCorsAnywhere();
+
   const state = {
     form: {
       validationErrors: [],
@@ -91,6 +94,7 @@ const runApp = () => {
         console.log(`Process status changed from ${oldValue} to ${newValue}`);
         if (newValue === 'filling') break;
         processStatusMapping[newValue](watchedState, elements);
+        console.log(watchedState);
         break;
       default:
         break;
