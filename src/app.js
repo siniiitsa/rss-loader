@@ -8,7 +8,7 @@ import { isEqual, noop } from 'lodash';
 import { enableCorsAnywhere } from './cors-anywhere.js';
 import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
-import { parseRssToFeed } from './parser';
+import { buildFeed } from './feed-builder';
 
 const schema = yup
   .string()
@@ -35,7 +35,7 @@ const updateValidationState = (watchedState) => {
 };
 
 const updateLoadedFeedsState = (watchedState, rssData) => {
-  const { feed, articles } = parseRssToFeed(rssData);
+  const { feed, articles } = buildFeed(rssData, watchedState.form.fields.rssLink);
   watchedState.processErrors = [];
   watchedState.loadedArticles = [...watchedState.loadedArticles, ...articles];
   watchedState.loadedFeeds = [...watchedState.loadedFeeds, feed];

@@ -3,12 +3,13 @@ import { uniqueId } from 'lodash';
 const domparser = new DOMParser();
 const idPrefix = 'id_';
 
-const parseRssToFeed = (rssData) => {
+const buildFeed = (rssData, rssLink) => {
   const xmlDocument = domparser.parseFromString(rssData, 'text/xml');
   const feedId = uniqueId(idPrefix);
   return {
     feed: {
       id: feedId,
+      link: rssLink,
       title: xmlDocument.getElementsByTagName('title')[0].textContent,
     },
     articles: [...xmlDocument.getElementsByTagName('item')].map((item) => ({
@@ -20,4 +21,4 @@ const parseRssToFeed = (rssData) => {
   };
 };
 
-export { parseRssToFeed };
+export { buildFeed };
