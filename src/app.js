@@ -8,7 +8,10 @@ import { isEqual, noop } from 'lodash';
 import { enableCorsAnywhere } from './cors-anywhere.js';
 import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
-import { buildFeed } from './feed-builder';
+import { initAutoUpdate } from './auto-update';
+import { parseToFeed } from './rss-parser';
+
+const updateInterval = 5000;
 
 const schema = yup
   .string()
@@ -35,7 +38,7 @@ const updateValidationState = (watchedState) => {
 };
 
 const updateLoadedFeedsState = (watchedState, rssData) => {
-  const { feed, articles } = buildFeed(rssData, watchedState.form.fields.rssLink);
+  const { feed, articles } = parseToFeed(rssData, watchedState.form.fields.rssLink);
   watchedState.processErrors = [];
   watchedState.loadedArticles = [...watchedState.loadedArticles, ...articles];
   watchedState.loadedFeeds = [...watchedState.loadedFeeds, feed];
@@ -49,14 +52,25 @@ const handleLoadingError = (watchedState, error) => {
   watchedState.processStatus = 'failed';
 };
 
-const processStatusMapping = {
+const processStatusActions = {
   filling: noop,
-  loading: noop,
+  loading: renderForm,
   loaded: (watchedState, elements) => {
     renderFeeds(watchedState, elements);
     renderFeedback(watchedState, elements);
+    renderForm(watchedState, elements);
+    const isFirstLoadedFeed = watchedState.loadedFeeds.length === 1;
+    if (isFirstLoadedFeed) {
+      initAutoUpdate(watchedState, updateInterval);
+    }
   },
   failed: renderFeedback,
+};
+
+const updateStatusActions = {
+  updating: noop,
+  updated: renderFeeds,
+  unchanged: noop,
 };
 
 const runApp = () => {
@@ -71,6 +85,7 @@ const runApp = () => {
     },
     processStatus: 'filling',
     processErrors: [],
+    updateStatus: '',
     loadedLinks: [],
     loadedFeeds: [],
     loadedArticles: [],
@@ -79,6 +94,7 @@ const runApp = () => {
   const elements = {
     form: document.querySelector('form[data-form="load-rss-form"]'),
     rssLinkField: document.querySelector('input[name="rss-link"]'),
+    submitButton: document.querySelector('input[data-form="submit"]'),
     feedbackContainer: document.querySelector('.feedback'),
     feedsContainer: document.querySelector('.feeds'),
   };
@@ -91,8 +107,10 @@ const runApp = () => {
         renderFeedback(watchedState, elements);
         break;
       case 'processStatus':
-        if (newValue === 'filling') break;
-        processStatusMapping[newValue](watchedState, elements);
+        processStatusActions[newValue](watchedState, elements);
+        break;
+      case 'updateStatus':
+        updateStatusActions[newValue](watchedState, elements);
         break;
       default:
         break;

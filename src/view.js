@@ -3,6 +3,10 @@ import i18next from 'i18next';
 const renderForm = (watchedState, elements) => {
   const isValid = watchedState.form.validationErrors.length === 0;
   elements.rssLinkField.classList[isValid ? 'remove' : 'add']('is-invalid');
+  elements.submitButton.disabled = watchedState.processStatus === 'loading';
+  if (watchedState.processStatus === 'loaded') {
+    elements.rssLinkField.value = '';
+  }
 };
 
 const renderFeedback = (watchedState, elements) => {
@@ -33,8 +37,8 @@ const buildFeedsHTML = (watchedState) => {
   return watchedState.loadedFeeds
     .map((feed) => {
       const articlesHTML = watchedState.loadedArticles
-        .filter((article) => article.feedId === feed.id)
-        .map((article) => `<li><a href="${article.link}">${article.title}</a></li>`)
+        .filter(({ feedId }) => feedId === feed.id)
+        .map(({ link, title }) => `<li><a href="${link}">${title}</a></li>`)
         .join('');
 
       return `
@@ -50,7 +54,6 @@ const buildFeedsHTML = (watchedState) => {
 const renderFeeds = (watchedState, elements) => {
   const feedsHTML = buildFeedsHTML(watchedState);
   elements.feedsContainer.innerHTML = feedsHTML;
-  elements.rssLinkField.value = '';
 };
 
 export {
