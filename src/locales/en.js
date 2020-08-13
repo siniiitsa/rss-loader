@@ -6,6 +6,7 @@ export default {
       rssRequired: 'You need to provide an rss link',
     },
     successMessages: {
+      feedLoading: 'Loading...',
       feedLoaded: 'Feed has been loaded!',
     },
   },

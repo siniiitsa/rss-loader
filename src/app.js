@@ -6,10 +6,10 @@ import axios from 'axios';
 import i18next from 'i18next';
 import { isEqual, noop } from 'lodash';
 import { enableCorsAnywhere } from './cors-anywhere.js';
-import resources from './locales';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { initAutoUpdate } from './auto-update';
 import { parseToFeed } from './rss-parser';
+import resources from './locales';
 
 const updateInterval = 5000;
 
@@ -54,7 +54,10 @@ const handleLoadingError = (watchedState, error) => {
 
 const processStatusActions = {
   filling: noop,
-  loading: renderForm,
+  loading: (watchedState, elements) => {
+    renderForm(watchedState, elements);
+    renderFeedback(watchedState, elements);
+  },
   loaded: (watchedState, elements) => {
     renderFeeds(watchedState, elements);
     renderFeedback(watchedState, elements);
@@ -64,7 +67,10 @@ const processStatusActions = {
       initAutoUpdate(watchedState, updateInterval);
     }
   },
-  failed: renderFeedback,
+  failed: (watchedState, elements) => {
+    renderFeedback(watchedState, elements);
+    renderForm(watchedState, elements);
+  },
 };
 
 const updateStatusActions = {

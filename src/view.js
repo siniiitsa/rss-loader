@@ -9,6 +9,20 @@ const renderForm = (watchedState, elements) => {
   }
 };
 
+const feedbackStyleActions = {
+  neutral: (feedbackContainer) => {
+    feedbackContainer.classList.remove('text-danger', 'text-success');
+  },
+  success: (feedbackContainer) => {
+    feedbackContainer.classList.add('text-success');
+    feedbackContainer.classList.remove('text-danger');
+  },
+  error: (feedbackContainer) => {
+    feedbackContainer.classList.remove('text-success');
+    feedbackContainer.classList.add('text-danger');
+  },
+};
+
 const renderFeedback = (watchedState, elements) => {
   const { feedbackContainer } = elements;
   const { form } = watchedState;
@@ -18,6 +32,9 @@ const renderFeedback = (watchedState, elements) => {
   if (!isValid) {
     message = form.validationErrors[0];
     styleType = 'error';
+  } else if (watchedState.processStatus === 'loading') {
+    message = i18next.t('successMessages.feedLoading');
+    styleType = 'neutral';
   } else if (watchedState.processStatus === 'loaded') {
     message = i18next.t('successMessages.feedLoaded');
   } else if (watchedState.processStatus === 'failed') {
@@ -25,8 +42,7 @@ const renderFeedback = (watchedState, elements) => {
     styleType = 'error';
   }
   feedbackContainer.innerHTML = message;
-  feedbackContainer.classList[styleType === 'success' ? 'add' : 'remove']('text-success');
-  feedbackContainer.classList[styleType === 'error' ? 'add' : 'remove']('text-danger');
+  feedbackStyleActions[styleType](feedbackContainer);
 };
 
 const buildFeedsHTML = (watchedState) => {
