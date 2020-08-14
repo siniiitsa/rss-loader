@@ -58,7 +58,7 @@ const buildFeedsHTML = (watchedState) => {
         .join('');
 
       return `
-        <ul class="feed">
+        <ul class="feed list-unstyled">
           <h2>${feed.title}</h2>
           ${articlesHTML}
         </ul>
