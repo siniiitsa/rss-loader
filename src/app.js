@@ -1,5 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './css/index.css';
 import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
