@@ -17,11 +17,11 @@ const schema = yup
   .url(i18next.t('errorMessages.invalidUrl'))
   .required(i18next.t('errorMessages.rssRequired'));
 
-const validateRssLink = (watchedState) => {
+const validateRssLink = (link, loadedLinks) => {
   try {
     schema
-      .notOneOf(watchedState.loadedLinks, i18next.t('errorMessages.alreadyLoaded'))
-      .validateSync(watchedState.form.fields.rssLink);
+      .notOneOf(loadedLinks, i18next.t('errorMessages.alreadyLoaded'))
+      .validateSync(link);
     return [];
   } catch (validationError) {
     return validationError.errors;
@@ -29,7 +29,7 @@ const validateRssLink = (watchedState) => {
 };
 
 const updateValidationState = (watchedState) => {
-  const errors = validateRssLink(watchedState);
+  const errors = validateRssLink(watchedState.form.fields.rssLink, watchedState.loadedLinks);
   // eslint-disable-next-line no-param-reassign
   watchedState.form.validationErrors = errors;
   return errors.length === 0;
