@@ -19,11 +19,9 @@ const schema = yup
 
 const validateRssLink = (watchedState) => {
   try {
-    schema.test(
-      'check if already loaded',
-      i18next.t('errorMessages.alreadyLoaded'),
-      (link) => !watchedState.loadedLinks.includes(link),
-    ).validateSync(watchedState.form.fields.rssLink);
+    schema
+      .notOneOf(watchedState.loadedLinks, i18next.t('errorMessages.alreadyLoaded'))
+      .validateSync(watchedState.form.fields.rssLink);
     return [];
   } catch (validationError) {
     return validationError.errors;
