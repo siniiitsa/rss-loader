@@ -29,7 +29,8 @@ const validateRssLink = (link, loadedLinks) => {
 };
 
 const updateValidationState = (watchedState) => {
-  const errors = validateRssLink(watchedState.form.fields.rssLink, watchedState.loadedLinks);
+  const loadedLinks = watchedState.loadedFeeds.map((feed) => feed.link);
+  const errors = validateRssLink(watchedState.form.fields.rssLink, loadedLinks);
   // eslint-disable-next-line no-param-reassign
   watchedState.form.validationErrors = errors;
   return errors.length === 0;
@@ -41,7 +42,6 @@ const updateLoadedFeedsState = (watchedState, rssData) => {
   watchedState.processErrors = [];
   watchedState.loadedArticles.push(...articles);
   watchedState.loadedFeeds.push(feed);
-  watchedState.loadedLinks.push(watchedState.form.fields.rssLink);
   // eslint-disable-next-line no-param-reassign
   watchedState.form.fields.rssLink = '';
   // eslint-disable-next-line no-param-reassign
@@ -91,7 +91,6 @@ const runApp = () => {
     processStatus: 'filling',
     processErrors: [],
     updateStatus: '',
-    loadedLinks: [],
     loadedFeeds: [],
     loadedArticles: [],
   };
