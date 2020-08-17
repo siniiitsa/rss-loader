@@ -30,22 +30,28 @@ const validateRssLink = (watchedState) => {
 
 const updateValidationState = (watchedState) => {
   const errors = validateRssLink(watchedState);
+  // eslint-disable-next-line no-param-reassign
   watchedState.form.validationErrors = errors;
   return errors.length === 0;
 };
 
 const updateLoadedFeedsState = (watchedState, rssData) => {
   const { feed, articles } = parseToFeed(rssData, watchedState.form.fields.rssLink);
+  // eslint-disable-next-line no-param-reassign
   watchedState.processErrors = [];
   watchedState.loadedArticles.push(...articles);
   watchedState.loadedFeeds.push(feed);
   watchedState.loadedLinks.push(watchedState.form.fields.rssLink);
+  // eslint-disable-next-line no-param-reassign
   watchedState.form.fields.rssLink = '';
+  // eslint-disable-next-line no-param-reassign
   watchedState.processStatus = 'loaded';
 };
 
 const handleLoadingError = (watchedState, error) => {
+  // eslint-disable-next-line no-param-reassign
   watchedState.processErrors = [error.message];
+  // eslint-disable-next-line no-param-reassign
   watchedState.processStatus = 'failed';
 };
 
