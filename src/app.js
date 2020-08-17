@@ -37,9 +37,9 @@ const updateValidationState = (watchedState) => {
 const updateLoadedFeedsState = (watchedState, rssData) => {
   const { feed, articles } = parseToFeed(rssData, watchedState.form.fields.rssLink);
   watchedState.processErrors = [];
-  watchedState.loadedArticles = [...watchedState.loadedArticles, ...articles];
-  watchedState.loadedFeeds = [...watchedState.loadedFeeds, feed];
-  watchedState.loadedLinks = [...watchedState.loadedLinks, watchedState.form.fields.rssLink];
+  watchedState.loadedArticles.push(...articles);
+  watchedState.loadedFeeds.push(feed);
+  watchedState.loadedLinks.push(watchedState.form.fields.rssLink);
   watchedState.form.fields.rssLink = '';
   watchedState.processStatus = 'loaded';
 };
