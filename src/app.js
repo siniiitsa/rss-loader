@@ -59,10 +59,6 @@ const processStatusActions = {
     renderFeeds(watchedState, elements);
     renderFeedback(watchedState, elements);
     renderForm(watchedState, elements);
-    const isFirstLoadedFeed = watchedState.loadedFeeds.length === 1;
-    if (isFirstLoadedFeed) {
-      initAutoUpdate(watchedState, updateInterval);
-    }
   },
   failed: (watchedState, elements) => {
     renderFeedback(watchedState, elements);
@@ -131,7 +127,12 @@ const runApp = () => {
     if (isValid) {
       watchedState.processStatus = 'loading';
       axios.get(state.form.fields.rssLink)
-        .then((response) => updateLoadedFeedsState(watchedState, response.data))
+        .then((response) => {
+          updateLoadedFeedsState(watchedState, response.data);
+          if (watchedState.loadedFeeds.length === 1) {
+            initAutoUpdate(watchedState, updateInterval);
+          }
+        })
         .catch((error) => handleLoadingError(watchedState, error));
     }
   });
