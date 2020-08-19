@@ -126,18 +126,19 @@ const runApp = () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const isValid = updateValidationState(watchedState);
-    if (isValid) {
-      watchedState.processStatus = 'loading';
-      axios.get(addCorsAnywhere(state.form.fields.rssLink))
-        .then((response) => {
-          updateLoadedFeedsState(watchedState, response.data);
-          if (watchedState.loadedFeeds.length === 1) {
-            initAutoUpdate(watchedState, updateInterval);
-          }
-        })
-        .catch((error) => handleLoadingError(watchedState, error));
-    }
+    updateValidationState(watchedState);
+
+    if (watchedState.form.validationErrors.length > 0) return;
+
+    watchedState.processStatus = 'loading';
+    axios.get(addCorsAnywhere(state.form.fields.rssLink))
+      .then((response) => {
+        updateLoadedFeedsState(watchedState, response.data);
+        if (watchedState.loadedFeeds.length === 1) {
+          initAutoUpdate(watchedState, updateInterval);
+        }
+      })
+      .catch((error) => handleLoadingError(watchedState, error));
   });
 };
 
