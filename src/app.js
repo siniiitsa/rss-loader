@@ -101,10 +101,9 @@ const runApp = () => {
     feedsContainer: document.querySelector('.feeds'),
   };
 
-  const watchedState = onChange(state, (path, newValue, oldValue) => {
+  const watchedState = onChange(state, (path, newValue) => {
     switch (path) {
       case 'form.validationErrors':
-        if (isEqual(newValue, oldValue)) break;
         renderForm(watchedState, elements);
         renderFeedback(watchedState, elements);
         break;
