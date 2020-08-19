@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
 import i18next from 'i18next';
-import { isEqual, noop } from 'lodash';
+import { noop } from 'lodash';
 import { addCorsAnywhere } from './cors-anywhere.js';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { initAutoUpdate } from './auto-update';
@@ -33,7 +33,8 @@ const updateValidationState = (watchedState) => {
   const errors = validateRssLink(watchedState.form.fields.rssLink, loadedLinks);
   // eslint-disable-next-line no-param-reassign
   watchedState.form.validationErrors = errors;
-  return errors.length === 0;
+  // eslint-disable-next-line no-param-reassign
+  watchedState.form.isValid = errors.length === 0;
 };
 
 const updateLoadedFeedsState = (watchedState, rssData) => {
@@ -81,6 +82,7 @@ const updateStatusActions = {
 const runApp = () => {
   const state = {
     form: {
+      isValid: false,
       validationErrors: [],
       fields: {
         rssLink: '',
@@ -127,7 +129,7 @@ const runApp = () => {
     e.preventDefault();
     updateValidationState(watchedState);
 
-    if (watchedState.form.validationErrors.length > 0) return;
+    if (!watchedState.form.isValid) return;
 
     watchedState.processStatus = 'loading';
     axios.get(addCorsAnywhere(state.form.fields.rssLink))
