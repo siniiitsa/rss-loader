@@ -3,8 +3,10 @@ import i18next from 'i18next';
 const renderForm = (watchedState, elements) => {
   const isValid = watchedState.form.validationErrors.length === 0;
   elements.rssLinkField.classList[isValid ? 'remove' : 'add']('is-invalid');
+  // eslint-disable-next-line no-param-reassign
   elements.submitButton.disabled = watchedState.processStatus === 'loading';
   if (watchedState.processStatus === 'loaded') {
+    // eslint-disable-next-line no-param-reassign
     elements.rssLinkField.value = '';
   }
 };
@@ -69,6 +71,7 @@ const buildFeedsHTML = (watchedState) => {
 
 const renderFeeds = (watchedState, elements) => {
   const feedsHTML = buildFeedsHTML(watchedState);
+  // eslint-disable-next-line no-param-reassign
   elements.feedsContainer.innerHTML = feedsHTML;
 };
 
