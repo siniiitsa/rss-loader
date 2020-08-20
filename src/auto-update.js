@@ -1,21 +1,32 @@
 import axios from 'axios';
-import { buildArticle, parseRss } from './rss-parser.js';
+import { uniqueId } from 'lodash';
+import { parseRss } from './rss-parser.js';
 import { addCorsAnywhere } from './cors-anywhere.js';
+
+const buildArticle = (item, feedId) => ({
+  id: uniqueId(),
+  feedId,
+  title: item.title,
+  link: item.link,
+});
 
 const buildArticles = (watchedState, promises) => promises
   .flatMap((result, index) => {
     if (result.status !== 'fulfilled') return null;
+
     const feedId = watchedState.loadedFeeds[index].id;
-    const xmlDocument = parseRss(result.value.data);
-    const items = [...xmlDocument.getElementsByTagName('item')];
-    return items.map((item) => buildArticle(item, feedId));
+    const rssString = result.value.data;
+    const { items } = parseRss(rssString);
+    const articles = items.map((item) => buildArticle(item, feedId));
+    return articles;
   })
   .filter(Boolean);
 
-const getNewArticles = (watchedState, articles) => articles.filter((art) => {
-  const isAlreadyPresent = watchedState.loadedArticles
-    .some(({ title, feedId }) => art.title === title && art.feedId === feedId);
-  return !isAlreadyPresent;
+const getNewArticles = (alreadyLoadedArticles, articles) => articles.filter((art) => {
+  const isAlreadyLoaded = alreadyLoadedArticles.some(
+    ({ title, feedId }) => art.title === title && art.feedId === feedId,
+  );
+  return !isAlreadyLoaded;
 });
 
 const initAutoUpdate = (watchedState, updateInterval) => {
@@ -23,11 +34,13 @@ const initAutoUpdate = (watchedState, updateInterval) => {
     // eslint-disable-next-line no-param-reassign
     watchedState.updateStatus = 'updating';
     const updateResults = watchedState.loadedFeeds
-      .map((feed) => axios.get(addCorsAnywhere(feed.link)));
+      .map(({ link }) => addCorsAnywhere(link))
+      .map(axios.get);
+
     Promise.allSettled(updateResults)
       .then((promises) => {
         const articles = buildArticles(watchedState, promises);
-        const newArticles = getNewArticles(watchedState, articles);
+        const newArticles = getNewArticles(watchedState.loadedArticles, articles);
         if (newArticles.length > 0) {
           // eslint-disable-next-line no-param-reassign
           watchedState.loadedArticles = [...watchedState.loadedArticles, ...newArticles];

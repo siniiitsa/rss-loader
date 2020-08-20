@@ -3,11 +3,11 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
 import i18next from 'i18next';
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 import { addCorsAnywhere } from './cors-anywhere.js';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { initAutoUpdate } from './auto-update';
-import { parseToFeed } from './rss-parser';
+import { parseRss } from './rss-parser';
 import resources from './locales';
 
 const updateInterval = 5000;
@@ -37,8 +37,19 @@ const updateValidationState = (watchedState) => {
   watchedState.form.isValid = errors.length === 0;
 };
 
-const updateLoadedFeedsState = (watchedState, rssData) => {
-  const { feed, articles } = parseToFeed(rssData, watchedState.form.fields.rssLink);
+const buildFeed = (title, link) => ({ title, link, id: uniqueId() });
+
+const buildArticle = (item, feedId) => ({
+  id: uniqueId(),
+  feedId,
+  title: item.title,
+  link: item.link,
+});
+
+const updateLoadedFeedsState = (watchedState, rssString) => {
+  const { title, items } = parseRss(rssString);
+  const feed = buildFeed(title, watchedState.form.fields.rssLink);
+  const articles = items.map((item) => buildArticle(item, feed.id));
   // eslint-disable-next-line no-param-reassign
   watchedState.processErrors = [];
   watchedState.loadedArticles.push(...articles);
