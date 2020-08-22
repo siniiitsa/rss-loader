@@ -4,41 +4,57 @@
     <title>Webpack Package</title>
   </head>
   <body>
-    <main>
+    <main class="d-flex flex-column min-vh-100">
       <section class="jumbotron jumbotron-fluid bg-dark">
         <div class="container text-white">
-          <h1 class="display-3">RSS Reader</h1>
-          <p class="lead">Start reading RSS today!</p>
-          <p class="text-muted my-1">
-            Example: https://ru.hexlet.io/lessons.rss
-          </p>
-          <form action="" data-form="load-rss-form">
-            <div class="form-row">
-              <div class="col">
-                <input
-                  required
-                  type="text"
-                  name="rss-link"
-                  class="form-control"
-                  placeholder="rss link"
-                />
-              </div>
-              <div class="col-auto">
-                <input
-                  type="submit"
-                  class="btn btn-primary"
-                  data-form="submit"
-                />
-              </div>
+          <div class="row">
+            <div class="col-md-10 col-lg-8 mx-auto">
+              <h1 class="display-2 mb-0">RSS Reader</h1>
+              <p class="lead">Start reading RSS today!</p>
+              <p class="text-muted mb-1">
+                Example: https://ru.hexlet.io/lessons.rss
+              </p>
+              <form action="" data-form="load-rss-form">
+                <div class="form-row">
+                  <div class="col">
+                    <input
+                      required
+                      type="text"
+                      name="rss-link"
+                      class="form-control form-control-lg"
+                      placeholder="rss link"
+                    />
+                  </div>
+                  <div class="col-auto">
+                    <input
+                      type="submit"
+                      class="btn btn-primary btn-lg"
+                      data-form="submit"
+                    />
+                  </div>
+                </div>
+              </form>
+              <p class="feedback my-1"></p>
             </div>
-          </form>
-          <p class="feedback my-1"></p>
+          </div>
         </div>
       </section>
 
-      <section>
-        <div class="container feeds"></div>
+      <section class="mb-5">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-10 col-lg-8 mx-auto feeds"></div>
+          </div>
+        </div>
       </section>
+
+      <footer class="footer border-top mt-auto py-3">
+        <div class="container">
+          <div class="text-center">
+            Created by <a href="https://github.com/siniiitsa">Sergey Sinitsa</a>
+          </div>
+        </div>
+      </footer>
     </main>
   </body>
 </html>
