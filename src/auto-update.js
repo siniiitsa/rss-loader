@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { uniqueId } from 'lodash';
 import { parseRss } from './rss-parser.js';
-import { addCorsAnywhere } from './cors-anywhere.js';
+import { addCorsProxy } from './cors-proxy.js';
 
 const buildArticle = (item, feedId) => ({
   id: uniqueId(),
@@ -34,7 +34,7 @@ const initAutoUpdate = (watchedState, updateInterval) => {
     // eslint-disable-next-line no-param-reassign
     watchedState.updateStatus = 'updating';
     const updateResults = watchedState.loadedFeeds
-      .map(({ link }) => addCorsAnywhere(link))
+      .map(({ link }) => addCorsProxy(link))
       .map(axios.get);
 
     Promise.allSettled(updateResults)

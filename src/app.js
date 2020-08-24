@@ -4,7 +4,7 @@ import onChange from 'on-change';
 import axios from 'axios';
 import i18next from 'i18next';
 import { noop, uniqueId } from 'lodash';
-import { addCorsAnywhere } from './cors-anywhere.js';
+import { addCorsProxy } from './cors-proxy.js';
 import { renderForm, renderFeedback, renderFeeds } from './view.js';
 import { initAutoUpdate } from './auto-update';
 import { parseRss } from './rss-parser';
@@ -143,7 +143,7 @@ const runApp = () => {
     if (!watchedState.form.isValid) return;
 
     watchedState.processStatus = 'loading';
-    axios.get(addCorsAnywhere(state.form.fields.rssLink))
+    axios.get(addCorsProxy(state.form.fields.rssLink))
       .then((response) => {
         updateLoadedFeedsState(watchedState, response.data);
         if (watchedState.loadedFeeds.length === 1) {
