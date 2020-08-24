@@ -42,21 +42,19 @@ const initAutoUpdate = (watchedState, updateInterval) => {
         const articles = buildArticles(watchedState, promises);
         const newArticles = getNewArticles(watchedState.loadedArticles, articles);
         if (newArticles.length > 0) {
-          // eslint-disable-next-line no-param-reassign
-          watchedState.loadedArticles = [...watchedState.loadedArticles, ...newArticles];
+          watchedState.loadedArticles.push(...newArticles);
           // eslint-disable-next-line no-param-reassign
           watchedState.updateStatus = 'updated';
         } else {
           // eslint-disable-next-line no-param-reassign
           watchedState.updateStatus = 'unchanged';
         }
-        updateFeeds();
       })
       .catch(() => {
         // eslint-disable-next-line no-param-reassign
         watchedState.updateStatus = 'updated';
-        updateFeeds();
-      });
+      })
+      .finally(updateFeeds);
   }, updateInterval);
 
   updateFeeds();
