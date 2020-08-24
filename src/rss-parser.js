@@ -1,14 +1,14 @@
 const buildItem = (itemElem) => ({
-  title: itemElem.getElementsByTagName('title')[0].textContent,
-  link: itemElem.getElementsByTagName('link')[0].textContent,
+  title: itemElem.querySelector('title').textContent,
+  link: itemElem.querySelector('link').textContent,
 });
 
 const parseRss = (rssString) => {
   const domparser = new DOMParser();
   const xmlDoc = domparser.parseFromString(rssString, 'text/xml');
   return {
-    title: xmlDoc.getElementsByTagName('title')[0].textContent,
-    items: [...xmlDoc.getElementsByTagName('item')].map(buildItem),
+    title: xmlDoc.querySelector('title').textContent,
+    items: [...xmlDoc.querySelectorAll('item')].map(buildItem),
   };
 };
 
