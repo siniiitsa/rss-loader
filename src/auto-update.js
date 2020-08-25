@@ -50,10 +50,6 @@ const initAutoUpdate = (watchedState, updateInterval) => {
           watchedState.feedsAutoUpdateStatus = 'unchanged';
         }
       })
-      .catch(() => {
-        // eslint-disable-next-line no-param-reassign
-        watchedState.feedsAutoUpdateStatus = 'updated';
-      })
       .finally(updateFeeds);
   }, updateInterval);
 
