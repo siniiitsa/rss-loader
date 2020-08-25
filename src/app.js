@@ -84,7 +84,7 @@ const processStatusActions = {
   },
 };
 
-const updateStatusActions = {
+const feedsAutoUpdateStatusActions = {
   updating: noop,
   updated: renderFeeds,
   unchanged: noop,
@@ -101,7 +101,7 @@ const runApp = () => {
     },
     processStatus: 'filling',
     processErrors: [],
-    updateStatus: '',
+    feedsAutoUpdateStatus: '',
     loadedFeeds: [],
     loadedArticles: [],
   };
@@ -123,8 +123,8 @@ const runApp = () => {
       case 'processStatus':
         processStatusActions[newValue](watchedState, elements);
         break;
-      case 'updateStatus':
-        updateStatusActions[newValue](watchedState, elements);
+      case 'feedsAutoUpdateStatus':
+        feedsAutoUpdateStatusActions[newValue](watchedState, elements);
         break;
       default:
         break;

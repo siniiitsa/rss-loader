@@ -32,7 +32,7 @@ const getNewArticles = (alreadyLoadedArticles, articles) => articles.filter((art
 const initAutoUpdate = (watchedState, updateInterval) => {
   const updateFeeds = () => setTimeout(() => {
     // eslint-disable-next-line no-param-reassign
-    watchedState.updateStatus = 'updating';
+    watchedState.feedsAutoUpdateStatus = 'updating';
     const updateResults = watchedState.loadedFeeds
       .map(({ link }) => addCorsProxy(link))
       .map(axios.get);
@@ -44,15 +44,15 @@ const initAutoUpdate = (watchedState, updateInterval) => {
         if (newArticles.length > 0) {
           watchedState.loadedArticles.push(...newArticles);
           // eslint-disable-next-line no-param-reassign
-          watchedState.updateStatus = 'updated';
+          watchedState.feedsAutoUpdateStatus = 'updated';
         } else {
           // eslint-disable-next-line no-param-reassign
-          watchedState.updateStatus = 'unchanged';
+          watchedState.feedsAutoUpdateStatus = 'unchanged';
         }
       })
       .catch(() => {
         // eslint-disable-next-line no-param-reassign
-        watchedState.updateStatus = 'updated';
+        watchedState.feedsAutoUpdateStatus = 'updated';
       })
       .finally(updateFeeds);
   }, updateInterval);

@@ -49,7 +49,7 @@ const renderFeedback = (watchedState, elements) => {
 
 const buildFeedsHTML = (watchedState) => {
   if (watchedState.loadedFeeds.length === 0) {
-    throw new Error('No loaded feeds to display!');
+    return undefined;
   }
 
   return watchedState.loadedFeeds
